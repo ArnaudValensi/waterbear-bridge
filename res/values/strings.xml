@@ -6,5 +6,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="connect">Connect</string>
     <string name="send_test">Send Test</string>
+    <string name="udp_port">Port</string>
+    <string name="udp_port_summ">The UDP port used to receive data.</string>
 
 </resources>
