@@ -8,5 +8,9 @@
     <string name="send_test">Send Test</string>
     <string name="udp_port">Port</string>
     <string name="udp_port_summ">The UDP port used to receive data.</string>
+    <string name="udp_port_default">6666</string>
+    <string name="bt_name">Bluetooth</string>
+    <string name="bt_name_summ">Set name of bluetooth device</string>
+    <string name="bt_name_default">linvor</string>
 
 </resources>

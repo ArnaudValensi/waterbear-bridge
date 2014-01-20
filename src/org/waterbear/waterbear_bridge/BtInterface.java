@@ -9,23 +9,33 @@ import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class BtInterface {
-
+	private Context context;
 	private BluetoothDevice device = null;
 	private BluetoothSocket socket = null;
 	private InputStream receiveStream = null;
 	private OutputStream sendStream = null;
-	
 	private ReceiverThread receiverThread;
 
-	Handler hstatus;
+	protected String prefBTName;
+	protected Handler hstatus;
 
-	public BtInterface(Handler hstatus, Handler h) {
+	public BtInterface(Context context, Handler hstatus, Handler h) {
+		this.context = context;
+		
+		SharedPreferences sharedPref = 
+				PreferenceManager.getDefaultSharedPreferences(
+						this.context);
+		this.prefBTName = sharedPref.getString("bt_name", "");
+		
 		Set<BluetoothDevice> setpairedDevices = 
 				BluetoothAdapter.getDefaultAdapter().getBondedDevices();
 		BluetoothDevice[] pairedDevices = 
@@ -33,7 +43,7 @@ public class BtInterface {
 				.toArray(new BluetoothDevice[setpairedDevices.size()]);
 		
 		for(int i=0;i<pairedDevices.length;i++) {
-			if(pairedDevices[i].getName().contains("BT UART")) {
+			if(pairedDevices[i].getName().contains(prefBTName)) {
 				this.device = pairedDevices[i];
 				try {
 					this.socket = this.device.createRfcommSocketToServiceRecord(
@@ -75,13 +85,18 @@ public class BtInterface {
 				try {
 					socket.connect();
 					
-					BtInterface.this.info("Bluetooth connected\n");
+					BtInterface.this.info("Bluetooth connected (name: \"" + 
+					                       BtInterface.this.prefBTName + "\")\n");
 	                
 					receiverThread.start();
 					
 				} catch (IOException e) {
 					Log.v("N", "Connection Failed : "+e.getMessage());
 					BtInterface.this.error(e);
+					e.printStackTrace();
+				} catch (NullPointerException e) {
+					BtInterface.this.info("Cannot find bluetooth (name: \"" + 
+		                                  BtInterface.this.prefBTName + "\")\n");
 					e.printStackTrace();
 				}
 			}
@@ -90,7 +105,8 @@ public class BtInterface {
 
 	public void close() {
 		try {
-			socket.close();
+			if (socket != null)
+				socket.close();
 		} catch (IOException e) {
 			this.error(e);
 			e.printStackTrace();

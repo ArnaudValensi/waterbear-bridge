@@ -31,10 +31,10 @@ public class MainActivity extends Activity implements OnClickListener {
         this.sendTest = (Button) findViewById(R.id.send_test);
         this.sendTest.setOnClickListener(this);
         
-        this.bt = new BtInterface(handlerStatus, handlerBT);
+        this.bt = new BtInterface(this, handlerStatus, handlerBT);
         this.bt.connect();
         
-        this.udpServer = new UDPServer(handlerStatus, handlerUDP);
+        this.udpServer = new UDPServer(this, handlerStatus, handlerUDP);
         this.udpServer.start();
 	}
 
@@ -50,6 +50,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onDestroy();
 		this.bt.close();
 		this.udpServer.close();
+		try {
+			// TODO: wait the thread instead of this ugly thing.
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
     final Handler handlerStatus = new Handler() {

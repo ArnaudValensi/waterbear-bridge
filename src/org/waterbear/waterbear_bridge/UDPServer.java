@@ -5,18 +5,23 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 
 
 public class UDPServer {
 	private ReceiverThread receiverThread;
 	private DatagramSocket serverSocket = null;
 	protected volatile Boolean run = true;
-	Handler hstatus;
+	protected Handler hstatus;
+	protected Context context;
 	
-	public UDPServer(Handler hstatus, Handler handler) {
+	public UDPServer(Context context, Handler hstatus, Handler handler) {
+		this.context = context;
 		this.hstatus = hstatus;
 		this.receiverThread = new ReceiverThread(handler);
 	}
@@ -34,13 +39,19 @@ public class UDPServer {
 		
 		@Override 
 		public void run() {
+			SharedPreferences sharedPref = 
+					PreferenceManager.getDefaultSharedPreferences(
+							UDPServer.this.context);
+			String prefPort = sharedPref.getString("udp_port", "");
+			Integer port = Integer.parseInt(prefPort);
+			
 			try {
-				serverSocket = new DatagramSocket(6666);
+				serverSocket = new DatagramSocket(port);
 			} catch (SocketException e) {
 				UDPServer.this.error(e);
 				e.printStackTrace();
 			}
-			UDPServer.this.info("UDP server listening\n");
+			UDPServer.this.info("UDP server listening (port:  " + port + ")\n");
 			
 	    	DatagramPacket receivePacket;
 	    	

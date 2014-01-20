@@ -2,6 +2,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
         android:key="udp_port"
+        android:defaultValue="@string/udp_port_default"
         android:title="@string/udp_port"
         android:summary="@string/udp_port_summ" />
+    <EditTextPreference
+        android:defaultValue="@string/bt_name_default"
+        android:key="bt_name"
+        android:summary="@string/bt_name_summ"
+        android:title="@string/bt_name" />
+
 </PreferenceScreen>
