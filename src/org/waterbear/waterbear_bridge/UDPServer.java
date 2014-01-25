@@ -39,11 +39,16 @@ public class UDPServer {
 		
 		@Override 
 		public void run() {
+			Integer port;
 			SharedPreferences sharedPref = 
 					PreferenceManager.getDefaultSharedPreferences(
 							UDPServer.this.context);
 			String prefPort = sharedPref.getString("udp_port", "");
-			Integer port = Integer.parseInt(prefPort);
+			try {
+			port = Integer.parseInt(prefPort);
+			} catch (NumberFormatException e) {
+				port = 6666;
+			}
 			
 			try {
 				serverSocket = new DatagramSocket(port);
